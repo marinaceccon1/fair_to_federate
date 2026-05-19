@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Trained models
+single_models/*.pt
+best_models_2clients/
+best_models_3clients/
+best_models_5clients/
+best_models_7clients/
+
+# Experiment runtime files
+experiments/*.json
+experiments/*.lock
+
+# Evaluation results
+evaluation_results_standalone/
+evaluation_results_2clients/
+evaluation_results_3clients/
+evaluation_results_5clients/
+evaluation_results_7clients/
+
+# Federation advantage CSVs (generated outputs)
+federation_advantage_*.csv
+
+# Environment
+.env
