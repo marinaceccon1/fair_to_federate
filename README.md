@@ -3,6 +3,8 @@
 
 > Code for the paper *"Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning"*, under review at CIKM 2026.
 
+This repository also includes the **supplementary material** for the paper (**supplementary_material_fair_to_federate.pdf**), containing additional experimental results: predicted vs. actual plots and feature importance analyses for the BalAcc and minTPR targets, SHAP beeswarm plots for all prediction targets on both datasets (from both the candidate and existing federation members' perspectives), and R² breakdowns by federation size relative to Fitzpatrick17k.
+
 ---
 
 ## Overview
