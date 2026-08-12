@@ -261,4 +261,10 @@ All delta targets are sign-normalized so that **positive = improvement** across 
 
 ## Citation
 
-This paper is currently under anonymous review. Citation information will be added upon publication.
+This work has been accepted for publication at **CIKM 2026** (the 35th ACM International Conference on Information and Knowledge Management), Rome, Italy.
+
+The full citation, DOI, and BibTeX entry will be added here once they are available from ACM.
+
+If you use this code or build on this work in the meantime, please cite:
+
+> M. Ceccon, A. Fabris, O. Irrera, G. Silvello, G. A. Susto. "Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning." *Proceedings of the 35th ACM International Conference on Information and Knowledge Management (CIKM '26)*, Rome, Italy, 2026.
