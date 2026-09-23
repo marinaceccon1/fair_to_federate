@@ -44,7 +44,7 @@ This repository and the released files contain no personal data, pseudonymized r
 ## 4. Method
 
 - **Algorithm or architecture.** Two stages. Stage 1: controlled simulation — DenseNet-121 image classifiers trained standalone and federated (FedAvg, Flower, 30 rounds, full participation, 1 local epoch) over configurations that vary client size, demographic composition and injected label-bias rate. Stage 2: tabular meta-regressors (Linear Regression, Ridge, Random Forest, Gradient Boosting, XGBoost) that map candidate and federation meta-features to the metric-change vectors, 5-fold cross-validation with randomized hyperparameter search.
-- **Training setting.** Federated (simulated, single-machine/multi-GPU) and centralized standalone baselines.
+- **Training setting.** Federated (simulated, single-machine/multi-GPU) and standalone baselines.
 - **Privacy techniques.** Not applicable to the release itself; the method by design uses only aggregate institution-level metadata (size, composition, label-bias rate) and never raw data or model weights. No differential privacy or secure aggregation is implemented.
 
 ## 5. Performance
