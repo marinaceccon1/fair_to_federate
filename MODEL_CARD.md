@@ -7,7 +7,7 @@
 
 | Field | Value |
 |---|---|
-| Name | fair_to_federate — Federation Assessment framework |
+| Name | fair_to_federate |
 | Version | v1.0 (CIKM '26 camera-ready) |
 | Type | Software or library (research code; no trained model weights and no data are distributed) |
 | Owner partner and contact | University of Padova — Marina Ceccon, marina.ceccon@phd.unipd.it |
