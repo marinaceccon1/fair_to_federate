@@ -12,7 +12,7 @@
 | Type | Software or library (research code; no trained model weights and no data are distributed) |
 | Owner partner and contact | University of Padova — Marina Ceccon, marina.ceccon@phd.unipd.it |
 | License | MIT (see LICENSE file) |
-| Repository and DOI | https://github.com/marinaceccon1/fair_to_federate — DOI: <!-- opzionale: archiviare su Zenodo --> |
+| Repository and DOI | https://github.com/marinaceccon1/fair_to_federate — DOI: N/A |
 | Release date | August 2026 |
 | Related task or deliverable | N/A |
 | How to cite | M. Ceccon, A. Fabris, O. Irrera, G. Silvello, G. A. Susto. "Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning." Proc. CIKM '26, Rome, Italy, 2026. doi:10.1145/3799682.3840981 |
