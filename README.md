@@ -1,9 +1,15 @@
 # Fair to Federate?
+
+> **Research use only. Not a medical device.**
+> This software was developed in the HEREDITARY project as a research prototype. It has not been assessed or certified under the EU Medical Device Regulation (EU) 2017/745. It must not be used to diagnose, treat, monitor or make any other decision about individual patients.
+
 ### Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning
 
-> Code for the paper *"Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning"*, under review at CIKM 2026.
+> Code for the paper *"Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning"*, accepted at **CIKM 2026** (35th ACM International Conference on Information and Knowledge Management), Rome, Italy, 7–11 November 2026.
 
 This repository also includes the **supplementary material** for the paper (**supplementary_material_fair_to_federate.pdf**), containing additional experimental results: predicted vs. actual plots and feature importance analyses for the BalAcc and minTPR targets, SHAP beeswarm plots for all prediction targets on both datasets (from both the candidate and existing federation members' perspectives), and R² breakdowns by federation size relative to Fitzpatrick17k.
+
+Intended use, data provenance, known limitations and out-of-scope uses are documented in [MODEL_CARD.md](MODEL_CARD.md).
 
 ---
 
@@ -13,20 +19,23 @@ This repository implements a **two-stage meta-learning framework** for the *Fede
 
 The framework is evaluated on two medical imaging domains:
 
-- **NIH ChestX-ray14** — multi-label chest X-ray diagnosis (7 pathologies), sex as the sensitive attribute.
+- **NIH ChestX-ray14** — multi-label chest X-ray diagnosis, sex as the sensitive attribute.
 - **Fitzpatrick17k** — skin lesion classification (tumoral vs. non-tumoral), Fitzpatrick skin tone as the sensitive attribute.
 
 **Key findings:**
+
 - Performance and fairness changes can be reliably predicted from metadata alone (R² up to 0.97 on held-out configurations).
 - Label bias is among the strongest predictors of fairness outcomes, often rivaling or exceeding demographic composition in importance.
 - The candidate and existing federation members can have **opposed interests** (e.g. a label-biased candidate gains by joining a clean federation while harming the existing members), and the framework makes these configurations predictable before any collaboration occurs.
+
+Neither datasets nor trained model weights are distributed with this repository: both datasets are public and must be obtained from their original sources (see [Data Setup](#data-setup)).
 
 ---
 
 ## Repository Structure
 
 ```
-fair_to_federated/
+fair_to_federate/
 ├── NIH/
 │   └── repo_nih/
 │       ├── src/                        # Shared source code
@@ -39,7 +48,7 @@ fair_to_federated/
 │       ├── standalone/                 # Stage 1a: standalone model training
 │       │   ├── run_experiments.py      # Runner (supports parallel workers)
 │       │   ├── train_single_config.py  # Single-config training script
-│       │   └── evaluate.py            # Evaluation on held-out test set
+│       │   └── evaluate.py             # Evaluation on held-out test set
 │       ├── federated_2clients/         # Stage 1b: 2-client federated experiments
 │       │   ├── run_experiments_2clients.py
 │       │   ├── server_nih_2clients.py
@@ -52,15 +61,15 @@ fair_to_federated/
 │       │   ├── run_experiments_cumulative_Nclients.py
 │       │   ├── server_nih_Nclients.py
 │       │   ├── client_nih_Nclients.py
-│       │   ├── experiment_manager_cumulative_Nclients.py
 │       │   ├── evaluate_federated_{3,5,7}clients.py
 │       │   ├── compute_client0_advantages_{3,5,7}clients.py
+│       │   ├── experiment_manager_cumulative_Nclients.py
 │       │   ├── data_setup_nih_Nclients.py
 │       │   └── param_grid_cumulative_Nclients.py
 │       ├── meta_learning/              # Stage 2: regression model training
 │       │   ├── train_meta_regressors.py        # Candidate perspective
 │       │   └── train_federation_regressors.py  # Federation perspective
-│       └── experiments/               # Auto-created: progress tracking, configs
+│       └── experiments/                # Auto-created: progress tracking, configs
 │
 └── Fitzpatrick17k/
     └── repo_fitz/
@@ -98,15 +107,16 @@ fair_to_federated/
 The framework proceeds in two stages.
 
 **Stage 1 — Simulation.** For a broad range of configurations parameterized by dataset size, demographic composition, and label bias, three model types are trained per configuration:
+
 1. A **standalone** model on the candidate client alone — $M(\{c\})$
 2. A **federated** model on the candidate and federation jointly — $M(\mathcal{F} \cup \{c\})$
 3. A **federated** model on the existing federation alone — $M(\mathcal{F})$
 
-Metric deltas are then computed from these three models for both the candidate perspective ($\Delta^\text{cand}$) and the federation perspective ($\Delta^\text{ext}$).
+Metric deltas are then computed from these three models for both the candidate perspective ($\Delta^\text{cand}$, models 1 and 3) and the current federation members' perspective ($\Delta^\text{curr}$, models 2 and 3).
 
 **Stage 2 — Regression.** The simulation outputs populate two parallel meta-datasets (one per perspective). A suite of regression models (Linear Regression, Ridge, Random Forest, Gradient Boosting, XGBoost) is trained via 5-fold cross-validation with randomized hyperparameter search to predict federation-induced metric changes for unseen configurations.
 
-**Client metadata.** Each client is described by three scalars: `size` (number of training samples), `comp` (fraction of majority-group samples), and `bias` (label bias rate — fraction of minority-group positive samples whose label is flipped to negative). The federation is described by size-weighted aggregates of these same quantities.
+**Client metadata.** Each client is described by three scalars: `size` (number of training samples), `comp` (fraction of majority-group samples), and `bias` (label bias rate — fraction of minority-group positive samples whose label is flipped to negative). The federation is described by size-weighted aggregates of these same quantities. No raw data and no model weights are exchanged between the parties at inference time.
 
 ---
 
@@ -118,6 +128,7 @@ Metric deltas are then computed from these three models for both the candidate p
 2. Place the images and metadata files under `NIH/repo_nih/src/data/`.
 
 **Experiment parameters:**
+
 - Training set fractions (`portion`): 3%, 6%, 12% of the full dataset
 - Gender compositions (`comp`): 100% male, 50/50, 100% female
 - Label flip fractions (`bias`): 0.0, 0.15, 0.30, 0.45 (applied to female positives; forced to 0.0 when no females present)
@@ -131,19 +142,22 @@ Metric deltas are then computed from these three models for both the candidate p
 2. Place the images and CSV metadata under `Fitzpatrick17k/repo_fitz/data/`.
 
 **Experiment parameters:**
+
 - Training set fractions (`portion`): 50%, 60%, 70% of the per-group balanced pool
 - Skin tone compositions: 100% light, 75% light / 25% dark, 50% / 50%
 - Label flip fractions (`bias`): 0.0, 0.15, 0.30, 0.45 (applied to dark-skin positives; forced to 0.0 for pure-light-skin clients)
+
+Both datasets are public and de-identified at source, and are used here under their own terms. They are not redistributed in this repository.
 
 ---
 
 ## Requirements
 
-```bash
+```
 pip install torch torchvision flwr scikit-learn xgboost pandas numpy matplotlib seaborn
 ```
 
-Federated training uses [Flower (flwr)](https://flower.dev/) with gRPC communication. Each worker spawns a server process and client processes that communicate over a configurable port.
+Federated training uses [Flower (flwr)](https://flower.dev/) with gRPC communication. Each worker spawns a server process and client processes that communicate over a configurable port, all on the local machine.
 
 **Hardware.** GPU recommended. Workers can be parallelized across multiple GPUs by setting the `WORKER_ID` and `GPU_DEVICE` environment variables.
 
@@ -155,7 +169,7 @@ All steps below apply to both domains (`NIH/repo_nih/` and `Fitzpatrick17k/repo_
 
 ### Step 1 — Train standalone models
 
-```bash
+```
 cd NIH/
 python repo_nih/standalone/run_experiments.py
 ```
@@ -164,7 +178,7 @@ This trains one standalone model per unique client configuration and saves check
 
 ### Step 2 — Run 2-client federated experiments
 
-```bash
+```
 cd NIH/
 
 # Single worker
@@ -179,7 +193,7 @@ Each worker spawns its own server and client processes. Workers coordinate via f
 
 ### Step 3 — Run N-client federated experiments (N = 3, 5)
 
-```bash
+```
 cd NIH/
 
 # 3-client federation
@@ -197,7 +211,7 @@ Configurations are sampled via stratified random sampling (stratified on the can
 
 ### Step 4 — Compute federation advantages
 
-```bash
+```
 # 2-client
 python repo_nih/federated_2clients/compute_client0_advantages_2clients.py
 
@@ -208,23 +222,26 @@ python repo_nih/federated/compute_client0_advantages_3clients.py
 python repo_nih/federated/compute_client0_advantages_5clients.py
 ```
 
-These scripts compute $\Delta^\text{cand}$ (candidate vs. standalone) and $\Delta^\text{ext}$ (federation with vs. without candidate) for each experiment, producing CSV files consumed by Stage 2.
+These scripts compute $\Delta^\text{cand}$ (candidate vs. standalone) and $\Delta^\text{curr}$ (federation with vs. without the candidate) for each experiment, producing CSV files consumed by Stage 2.
 
 ### Step 5 — Train meta-regressors (Stage 2)
 
 **Candidate perspective:**
-```bash
+
+```
 cd NIH/
 python repo_nih/meta_learning/train_meta_regressors.py
 ```
 
 **Federation perspective:**
-```bash
+
+```
 cd NIH/
 python repo_nih/meta_learning/train_federation_regressors.py
 ```
 
 Both scripts automatically locate the advantage CSVs produced in Step 4 (paths can be overridden via environment variables `RESULTS_2C`, `RESULTS_3C`, `RESULTS_5C`). They output:
+
 - Predicted vs. actual scatter plots
 - Feature importance plots
 - A `model_summary.csv` with CV R², RMSE, and MAE for every model–target combination
@@ -237,14 +254,14 @@ The same steps apply to the Fitzpatrick17k domain using the corresponding script
 
 Performance and fairness are evaluated on a shared held-out test set (15% of each dataset).
 
-| Metric | Description |
-|--------|-------------|
-| **AUC** | Area under the ROC curve (macro-averaged over pathologies for NIH) |
-| **BalAcc** | Balanced accuracy |
+| Metric     | Description                                                                           |
+| ---------- | ------------------------------------------------------------------------------------- |
+| **AUC**    | Area under the ROC curve (macro-averaged over pathologies for NIH)                    |
+| **BalAcc** | Balanced accuracy                                                                     |
 | **TPRgap** | Difference in true positive rate between majority and minority group (lower = fairer) |
-| **minTPR** | Minimum TPR across demographic groups |
+| **minTPR** | Minimum TPR across demographic groups                                                 |
 
-For Fitzpatrick17k, where the dark-skin positive test set is small, a **soft TPR** variant (average predicted probability over positive instances) replaces the standard hard TPR for more stable regression targets.
+For NIH, fairness metrics use micro-averaged TPR values, aggregating predictions across conditions before computing group-level rates. For Fitzpatrick17k, where the dark-skin positive test set is small, a **soft TPR** variant (average predicted probability over positive instances) replaces the standard hard TPR for more stable regression targets.
 
 All delta targets are sign-normalized so that **positive = improvement** across every metric.
 
@@ -256,6 +273,19 @@ All delta targets are sign-normalized so that **positive = improvement** across 
 - Federated training uses FedAvg for 30 communication rounds with full client participation and 1 local epoch per round.
 - Model selection uses lowest weighted validation loss across clients (weights proportional to local validation set sizes).
 - The 7-client generalization experiment (Section 5.1 of the paper) uses models trained on 2/3/5-client data evaluated directly on 150 independently generated 7-client configurations, without retraining.
+- Model architectures, training hyperparameters and data augmentation are detailed in the supplementary material.
+
+---
+
+## Limitations
+
+Results are obtained in a controlled simulation in which all clients of a federation are disjoint samples from the same source dataset, and label bias is injected at a known rate. This isolates the effect of demographic composition and label bias but omits the cross-institutional heterogeneity of real federations (acquisition equipment, imaging protocols, case mix). The reported accuracy should be read accordingly. See [MODEL_CARD.md](MODEL_CARD.md) for the full list of limitations and out-of-scope uses.
+
+---
+
+## License
+
+Released under the MIT License — see [LICENSE](LICENSE).
 
 ---
 
@@ -263,8 +293,8 @@ All delta targets are sign-normalized so that **positive = improvement** across 
 
 This work has been accepted for publication at **CIKM 2026** (the 35th ACM International Conference on Information and Knowledge Management), Rome, Italy.
 
-The full citation, DOI, and BibTeX entry will be added here once they are available from ACM.
+> M. Ceccon, A. Fabris, O. Irrera, G. Silvello, G. A. Susto. "Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning." *Proceedings of the 35th ACM International Conference on Information and Knowledge Management (CIKM '26)*, Rome, Italy, 2026. doi:10.1145/3799682.3840981
 
-If you use this code or build on this work in the meantime, please cite:
+## Acknowledgement
 
-> M. Ceccon, A. Fabris, O. Irrera, G. Silvello, G. A. Susto. "Fair to Federate? Two-Sided Prediction of Performance and Fairness Outcomes in Healthcare Federated Learning." *Proceedings of the 35th ACM International Conference on Information and Knowledge Management (CIKM '26)*, Rome, Italy, 2026.
+Funded by the European Union under grant agreement No 101137074 (HEREDITARY). Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Health and Digital Executive Agency (HaDEA). Neither the European Union nor the granting authority can be held responsible for them.
