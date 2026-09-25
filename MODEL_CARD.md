@@ -27,7 +27,7 @@
 - clinical diagnosis, prognosis or treatment of individual patients;
 - decisions about individuals, such as insurance, employment or access to care;
 - re-identification of individuals or linkage with other data sources;
-- deciding in practice whether a real hospital should join a real federation, without independent validation: the predictors reported in the paper are fitted on simulated clients drawn from a single source dataset;
+- deciding in practice whether a real hospital should join a real federation, without independent validation: the predictors reported in the paper are fitted on simulated clients drawn from the NIH and Fitzpatrick17k datasets;
 - populations, devices or data types not described in Section 3.
 
 ## 3. Data provenance
